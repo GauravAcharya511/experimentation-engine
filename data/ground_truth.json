@@ -1,0 +1,16 @@
+{
+  "design": {
+    "n_users": 60000,
+    "treatment_share": 0.5,
+    "experiment_days": 14,
+    "share_new_users_actual": 0.3481
+  },
+  "true_effects": {
+    "conversion_abs_lift_overall": 0.00813,
+    "conversion_abs_lift_new": 0.014,
+    "conversion_abs_lift_returning": 0.005,
+    "revenue_abs_lift": 0.8,
+    "latency_true_effect_ms": 0.0
+  },
+  "notes": "Analysis estimates should recover these within their CIs."
+}
