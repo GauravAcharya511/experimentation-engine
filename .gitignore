@@ -15,3 +15,7 @@ dbt/logs/
 .DS_Store
 .vscode/
 .idea/
+
+# DuckDB warehouse file (rebuilt by dbt)
+dbt/dev.duckdb
+*.duckdb

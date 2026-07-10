@@ -1,0 +1,16 @@
+version: 2
+
+# The "bronze" layer: raw files exactly as the generator emits them.
+# dbt-duckdb reads the parquet directly via external_location; {name} is
+# substituted with each table name. DBT_DATA_DIR defaults to ../data (run
+# dbt from inside the dbt/ folder), and can be overridden for CI/other paths.
+sources:
+  - name: raw
+    description: "Raw experiment tables emitted by src/simulate.py."
+    meta:
+      external_location: "read_parquet('{{ env_var('DBT_DATA_DIR', '../data') }}/{name}.parquet')"
+    tables:
+      - name: assignments
+        description: "One row per user: variant, exposure day, pre-period covariates, segments."
+      - name: events
+        description: "One row per session: revenue, latency, conversion flag."

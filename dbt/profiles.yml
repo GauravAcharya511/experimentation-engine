@@ -1,0 +1,21 @@
+experimentation_engine:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      # Local warehouse file (git-ignored). No cloud credentials required.
+      path: "dev.duckdb"
+      threads: 4
+
+    # ---------------------------------------------------------------------
+    # Swap-in for BigQuery (uncomment + `dbt run --target bq`). Kept here so
+    # you can honestly say the project runs on BigQuery, not just DuckDB.
+    # bq:
+    #   type: bigquery
+    #   method: service-account
+    #   project: your-gcp-project
+    #   dataset: experimentation
+    #   keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
+    #   threads: 4
+    #   location: US
+    # ---------------------------------------------------------------------

@@ -1,16 +1,27 @@
-.PHONY: setup data test dashboard clean
+.PHONY: setup data build test dbt-run dbt-test dashboard clean
+
+DBT = cd dbt && DBT_DATA_DIR=$(abspath data) dbt
 
 setup:          ## create venv + install deps
-	python -m venv .venv && . .venv/bin/activate && pip install -U pip && pip install -r requirements.txt
+	python3 -m venv .venv && . .venv/bin/activate && pip install -U pip && pip install -r requirements.txt
 
 data:           ## generate the synthetic experiment dataset
 	python src/simulate.py
 
-test:           ## run the test suite
+build: data     ## generate data, then run the dbt pipeline
+	$(DBT) run --profiles-dir .
+
+dbt-run:        ## run dbt models against existing data
+	$(DBT) run --profiles-dir .
+
+dbt-test:       ## run dbt data-quality tests
+	$(DBT) test --profiles-dir .
+
+test:           ## run the python test suite (Phase 3)
 	pytest -q
 
-dashboard:      ## launch the Streamlit experiment readout (Phase 4)
+dashboard:      ## launch the Streamlit readout (Phase 4)
 	streamlit run app/main.py
 
-clean:          ## remove generated data + caches
-	rm -f data/*.parquet && rm -rf __pycache__ src/__pycache__ .pytest_cache
+clean:          ## remove generated data, warehouse, dbt artifacts, caches
+	rm -f data/*.parquet dbt/dev.duckdb && rm -rf dbt/target dbt/logs __pycache__ src/__pycache__ .pytest_cache

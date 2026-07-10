@@ -50,10 +50,33 @@ The generator injects a small primary-metric lift, a continuous revenue lift
 correlated with the pre-period (so CUPED has leverage), a **null** guardrail
 (latency), and **heterogeneous** effects by tenure (new users respond more).
 
+## The dbt layer (bronze → silver → gold)
+
+Raw parquet is modeled into an analysis-ready mart with dbt on DuckDB:
+
+- **sources** (`raw`) — the parquet files, read directly (bronze).
+- **staging** (`stg_assignments`, `stg_events`) — typed, renamed, 1:1 with
+  source; materialized as views (silver).
+- **intermediate** (`int_user_session_metrics`) — aggregates the session log to
+  one row per user (silver).
+- **marts** (`experiment_metrics`) — the gold table the statistics layer reads:
+  one row per user with variant, the CUPED covariate, segments, and the
+  primary / secondary / guardrail metrics.
+
+14 dbt tests enforce data quality (uniqueness of the user key, non-null keys,
+accepted values on variant/converted). Run it:
+
+```bash
+make build       # generate data + run the full dbt pipeline
+make dbt-test    # run the 14 data-quality tests
+```
+
+The dbt profile is DuckDB by default and includes a commented BigQuery target.
+
 ## Roadmap
 
 - [x] Phase 1 — reproducible data generator with ground-truth validation harness
-- [ ] Phase 2 — dbt models: raw events → per-user experiment metric marts
+- [x] Phase 2 — dbt models: raw events → per-user experiment metric marts (+ tests)
 - [ ] Phase 3 — analysis engine: power, t-test/proportions, CUPED, sequential,
       multiple-comparison correction, heterogeneous treatment effects (+ tests)
 - [ ] Phase 4 — Streamlit experiment-readout dashboard

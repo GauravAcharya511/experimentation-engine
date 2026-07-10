@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: stg_assignments
+    description: "Typed, one-row-per-user assignment log."
+    columns:
+      - name: user_id
+        description: "Primary key."
+        data_tests: [unique, not_null]
+      - name: variant
+        description: "Experiment arm."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['control', 'treatment']
+      - name: tenure
+        data_tests:
+          - accepted_values:
+              values: ['new', 'returning']
+
+  - name: stg_events
+    description: "Typed session-grain event log."
+    columns:
+      - name: user_id
+        data_tests: [not_null]
+      - name: is_conversion
+        data_tests:
+          - accepted_values:
+              values: [0, 1]

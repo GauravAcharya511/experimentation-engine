@@ -1,0 +1,23 @@
+name: 'experimentation_engine'
+version: '1.0.0'
+profile: 'experimentation_engine'
+
+model-paths: ["models"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Layer conventions (medallion mapping):
+#   sources      = bronze (raw parquet, untouched)
+#   staging      = silver (typed, renamed, 1:1 with source)  -> views (cheap)
+#   intermediate = silver (business aggregation)              -> views
+#   marts        = gold   (final, analysis-ready)             -> tables (durable)
+models:
+  experimentation_engine:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table

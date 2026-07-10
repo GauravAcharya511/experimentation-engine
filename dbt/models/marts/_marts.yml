@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: experiment_metrics
+    description: >
+      Gold, analysis-ready mart: one row per user with variant, pre-period
+      covariate, segments, and primary/secondary/guardrail outcome metrics.
+      This is the single table the statistics layer reads from.
+    columns:
+      - name: user_id
+        description: "Primary key. Must survive the join 1:1 with assignments."
+        data_tests: [unique, not_null]
+      - name: variant
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: ['control', 'treatment']
+      - name: converted
+        description: "Primary metric (binary)."
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: revenue
+        description: "Secondary metric (continuous, >= 0)."
+        data_tests: [not_null]
