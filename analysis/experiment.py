@@ -79,6 +79,62 @@ def two_proportion_test(x_control: int, n_control: int,
     )
 
 
+@dataclass
+class MeanResult:
+    control_mean: float
+    treatment_mean: float
+    abs_lift: float
+    rel_lift: float
+    ci_low: float
+    ci_high: float
+    t_stat: float
+    p_value: float
+    n_control: int
+    n_treatment: int
+
+    def significant(self, alpha: float = 0.05) -> bool:
+        return self.p_value < alpha
+
+
+def two_sample_ttest(control_values, treatment_values,
+                     alpha: float = 0.05) -> MeanResult:
+    """Welch's two-sample t-test for a continuous metric (unequal variances).
+
+    Used for revenue (secondary) and latency (guardrail). Welch is the safe
+    default: it does not assume the two groups have equal variance.
+    """
+    import numpy as np
+
+    c = np.asarray(control_values, dtype=float)
+    t = np.asarray(treatment_values, dtype=float)
+    n_c, n_t = len(c), len(t)
+    m_c, m_t = c.mean(), t.mean()
+    v_c, v_t = c.var(ddof=1), t.var(ddof=1)
+    diff = m_t - m_c
+
+    se = (v_c / n_c + v_t / n_t) ** 0.5
+    # Welch-Satterthwaite degrees of freedom
+    df = (v_c / n_c + v_t / n_t) ** 2 / (
+        (v_c / n_c) ** 2 / (n_c - 1) + (v_t / n_t) ** 2 / (n_t - 1))
+    t_stat = diff / se
+    p_value = 2 * (1 - stats.t.cdf(abs(t_stat), df))
+    t_crit = stats.t.ppf(1 - alpha / 2, df)
+
+    return MeanResult(
+        control_mean=m_c, treatment_mean=m_t, abs_lift=diff,
+        rel_lift=diff / m_c if m_c else float("nan"),
+        ci_low=diff - t_crit * se, ci_high=diff + t_crit * se,
+        t_stat=t_stat, p_value=p_value,
+        n_control=n_c, n_treatment=n_t,
+    )
+
+
+def continuous_readout(df, column: str) -> MeanResult:
+    c = df.loc[df["variant"] == "control", column]
+    t = df.loc[df["variant"] == "treatment", column]
+    return two_sample_ttest(c, t)
+
+
 def load_metrics(db_path: Path = DB_PATH):
     """Load the per-user gold mart from the DuckDB warehouse."""
     if not db_path.exists():
