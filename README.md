@@ -1,7 +1,7 @@
 # Experimentation Analysis Engine
 
 An end-to-end A/B test analysis engine that takes a raw event stream, models it
-into experiment-ready metrics, and produces a rigorous ship / no-ship readout —
+into experiment-ready metrics, and produces a rigorous ship / no-ship readout -
 power, variance-reduced treatment effects (CUPED), sequential-testing
 corrections, multiple-comparison control, and heterogeneous (segment-level)
 effects.
@@ -41,9 +41,9 @@ python src/simulate.py
 
 `src/simulate.py` emits two raw tables (the grain a real pipeline ingests):
 
-- `assignments.parquet` — one row per user: variant, exposure day, pre-period
+- `assignments.parquet` - one row per user: variant, exposure day, pre-period
   covariates (`pre_revenue`, `pre_sessions`), and segments (tenure/device/country).
-- `events.parquet` — one row per session: `session_revenue`, `latency_ms`,
+- `events.parquet` - one row per session: `session_revenue`, `latency_ms`,
   `is_conversion`. dbt re-aggregates these to per-user metrics.
 
 The generator injects a small primary-metric lift, a continuous revenue lift
@@ -54,12 +54,12 @@ correlated with the pre-period (so CUPED has leverage), a **null** guardrail
 
 Raw parquet is modeled into an analysis-ready mart with dbt on DuckDB:
 
-- **sources** (`raw`) — the parquet files, read directly (bronze).
-- **staging** (`stg_assignments`, `stg_events`) — typed, renamed, 1:1 with
+- **sources** (`raw`) - the parquet files, read directly (bronze).
+- **staging** (`stg_assignments`, `stg_events`) - typed, renamed, 1:1 with
   source; materialized as views (silver).
-- **intermediate** (`int_user_session_metrics`) — aggregates the session log to
+- **intermediate** (`int_user_session_metrics`) - aggregates the session log to
   one row per user (silver).
-- **marts** (`experiment_metrics`) — the gold table the statistics layer reads:
+- **marts** (`experiment_metrics`) - the gold table the statistics layer reads:
   one row per user with variant, the CUPED covariate, segments, and the
   primary / secondary / guardrail metrics.
 
@@ -75,9 +75,9 @@ The dbt profile is DuckDB by default and includes a commented BigQuery target.
 
 ## Roadmap
 
-- [x] Phase 1 — reproducible data generator with ground-truth validation harness
-- [x] Phase 2 — dbt models: raw events → per-user experiment metric marts (+ tests)
-- [ ] Phase 3 — analysis engine: power, t-test/proportions, CUPED, sequential,
+- [x] Phase 1 - reproducible data generator with ground-truth validation harness
+- [x] Phase 2 - dbt models: raw events → per-user experiment metric marts (+ tests)
+- [ ] Phase 3 - analysis engine: power, t-test/proportions, CUPED, sequential,
       multiple-comparison correction, heterogeneous treatment effects (+ tests)
-- [ ] Phase 4 — Streamlit experiment-readout dashboard
-- [ ] Phase 5 — GitHub Actions CI (regenerate data, run dbt, run tests)
+- [ ] Phase 4 - Streamlit experiment-readout dashboard
+- [ ] Phase 5 - GitHub Actions CI (regenerate data, run dbt, run tests)
