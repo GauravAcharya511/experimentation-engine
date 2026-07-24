@@ -77,7 +77,7 @@ The dbt profile is DuckDB by default and includes a commented BigQuery target.
 
 - [x] Phase 1 - reproducible data generator with ground-truth validation harness
 - [x] Phase 2 - dbt models: raw events → per-user experiment metric marts (+ tests)
-- [ ] Phase 3 - analysis engine: power, t-test/proportions, CUPED, sequential,
+- [x] Phase 3 - analysis engine: power, t-test/proportions, CUPED, sequential,
       multiple-comparison correction, heterogeneous treatment effects (+ tests)
-- [ ] Phase 4 - Streamlit experiment-readout dashboard
-- [ ] Phase 5 - GitHub Actions CI (regenerate data, run dbt, run tests)
+- [x] Phase 4 - Streamlit experiment-readout dashboard
+- [x] Phase 5 - GitHub Actions CI (regenerate data, run dbt, run tests)
